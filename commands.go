@@ -244,6 +244,9 @@ type Cmdable interface {
 	RPushX(ctx context.Context, key string, values ...interface{}) *IntCmd
 	LMove(ctx context.Context, source, destination, srcpos, destpos string) *StringCmd
 	BLMove(ctx context.Context, source, destination, srcpos, destpos string, timeout time.Duration) *StringCmd
+	FunctionDelete(ctx context.Context, body string) *StringCmd
+	FunctionLoad(ctx context.Context, body string) *StringCmd
+	FunctionLoadReplace(ctx context.Context, body string) *StringCmd
 
 	SAdd(ctx context.Context, key string, members ...interface{}) *IntCmd
 	SCard(ctx context.Context, key string) *IntCmd
@@ -1672,6 +1675,24 @@ func (c cmdable) BLMove(
 ) *StringCmd {
 	cmd := NewStringCmd(ctx, "blmove", source, destination, srcpos, destpos, formatSec(ctx, timeout))
 	cmd.setReadTimeout(timeout)
+	_ = c(ctx, cmd)
+	return cmd
+}
+
+func (c cmdable) FunctionDelete(ctx context.Context, body string) *StringCmd {
+	cmd := NewStringCmd(ctx, "function", "delete", body)
+	_ = c(ctx, cmd)
+	return cmd
+}
+
+func (c cmdable) FunctionLoad(ctx context.Context, body string) *StringCmd {
+	cmd := NewStringCmd(ctx, "function", "load", body)
+	_ = c(ctx, cmd)
+	return cmd
+}
+
+func (c cmdable) FunctionLoadReplace(ctx context.Context, body string) *StringCmd {
+	cmd := NewStringCmd(ctx, "function", "load", "replace", body)
 	_ = c(ctx, cmd)
 	return cmd
 }
