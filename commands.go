@@ -1686,6 +1686,9 @@ func (c cmdable) FunctionDelete(ctx context.Context, body string) *StringCmd {
 }
 
 func (c cmdable) FunctionLoad(ctx context.Context, body string) *StringCmd {
+	if !strings.HasPrefix(body, "#!lua") {
+		panic("function code must start with #!lua")
+	}
 	cmd := NewStringCmd(ctx, "function", "load", body)
 	_ = c(ctx, cmd)
 	return cmd
